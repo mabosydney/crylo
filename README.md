@@ -14,7 +14,7 @@ This project provides a simple Monero-based lottery that can run on a small VPS.
 
 1. **Install system packages**
    ```bash
-   sudo apt update && sudo apt install -y python3 python3-venv python3-pip tor
+   sudo apt update && sudo apt install -y python3 python3-venv python3-pip
    ```
 2. **Clone repository**
    ```bash
@@ -42,13 +42,18 @@ This project provides a simple Monero-based lottery that can run on a small VPS.
 ### Resuming after closing PuTTY
 Use the `screen` or `tmux` command before running the server so that it stays active when you disconnect.
 
-### Onion Service (optional)
-Install Tor and add a hidden service pointing to port 5000. The `torrc` entry looks like:
+
+### Wallet RPC and Low Disk Usage
+Running a Monero node requires significant disk space. To keep the server under
+25GB you can connect `monero-wallet-rpc` to a **remote node** instead of running
+`monerod` locally:
+
+```bash
+/opt/monero/monero-wallet-rpc --wallet-file lottery --rpc-bind-port 18083 \
+  --disable-rpc-login --daemon-address node.moneroworld.com:18089
 ```
-HiddenServiceDir /var/lib/tor/lottery/
-HiddenServicePort 80 127.0.0.1:5000
-```
-Restart tor and note the generated `.onion` address in `/var/lib/tor/lottery/hostname`.
+Using a remote node avoids storing the blockchain locally. See
+`monero_setup/README.md` for installation details.
 
 ## Game Rules
 1. Choose six numbers from 1–49.

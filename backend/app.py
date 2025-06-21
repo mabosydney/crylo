@@ -16,14 +16,17 @@ monero = MoneroRPC(RPC_URL)
 init_db()
 
 def generate_numbers():
+    """Return six random numbers between 1 and 49."""
     return [int.from_bytes(os.urandom(2), 'big') % 49 + 1 for _ in range(6)]
 
 @app.route('/')
 def index():
+    """Front page with ticket purchase form."""
     return render_template('index.html', price=config['ticket_price'])
 
 @app.route('/buy', methods=['POST'])
 def buy():
+    """Create a new ticket and display the subaddress for payment."""
     numbers = request.form.getlist('numbers')
     if len(numbers) != 6:
         abort(400, 'Choose exactly 6 numbers')
@@ -42,6 +45,7 @@ def buy():
 
 @app.route('/status/<int:ticket_id>')
 def status(ticket_id):
+    """Check whether payment for a ticket has been received."""
     conn = get_conn()
     c = conn.cursor()
     row = c.execute('SELECT paid, subaddress_index FROM tickets WHERE id=?', (ticket_id,)).fetchone()
@@ -70,6 +74,7 @@ def status(ticket_id):
 # Placeholder results
 @app.route('/results')
 def results():
+    """Show the latest draw results."""
     conn = get_conn()
     c = conn.cursor()
     row = c.execute('SELECT week, numbers, winners, payout FROM results ORDER BY week DESC LIMIT 1').fetchone()
@@ -78,6 +83,7 @@ def results():
 
 @app.route('/draw', methods=['POST'])
 def draw():
+    """Perform the weekly draw and send payouts."""
     if request.form.get('password') != config['admin_password']:
         abort(403)
     numbers = generate_numbers()
@@ -94,7 +100,10 @@ def draw():
     payout = 0
     if winners:
         total_pool = len(entries) * config['ticket_price']
-        payout = total_pool * (1 - config['fee_percent']/100) / len(winners)
+        fee_amt = total_pool * config['fee_percent'] / 100
+        payout = (total_pool - fee_amt) / len(winners)
+        if fee_amt > 0:
+            monero.transfer([{"address": config['owner_address'], "amount": int(fee_amt*1e12)}])
         for eid, addr in winners:
             monero.transfer([{"address": addr, "amount": int(payout*1e12)}])
     c.execute('INSERT OR REPLACE INTO results (week, numbers, winners, payout) VALUES (?,?,?,?)', (week, ','.join(map(str,numbers)), ','.join(a for _,a in winners), payout))
