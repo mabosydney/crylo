@@ -5,7 +5,12 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-<h1>Weekly XMR Lottery</h1>
+<header>
+    <h1>Weekly XMR Lottery</h1>
+    <nav>
+        <a href="/">Home</a> | <a href="/results">Results</a>
+    </nav>
+</header>
 <p>Each ticket costs {{ price }} XMR. Choose 6 numbers between 1 and 49.</p>
 <form action="/buy" method="post">
     {% for i in range(1,50) %}

@@ -5,7 +5,13 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-<h1>Payment Required</h1>
+<header>
+    <h1>Weekly XMR Lottery</h1>
+    <nav>
+        <a href="/">Home</a> | <a href="/results">Results</a>
+    </nav>
+</header>
+<h2>Payment Required</h2>
 <p>Send exactly {{ price }} XMR to the address below. Your ticket ID is {{ ticket_id }}.</p>
 <pre>{{ subaddress }}</pre>
 <p>After payment, <a href="/status/{{ ticket_id }}">check status here</a>.</p>

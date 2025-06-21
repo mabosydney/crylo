@@ -1,10 +1,10 @@
 # Monero Setup Guide
 
-These instructions explain how to install `monerod` and `monero-wallet-rpc` on Ubuntu.
+These instructions explain how to install `monero-wallet-rpc` on Ubuntu and connect it to a remote node so no blockchain is stored locally.
 
 1. **Install dependencies**
    ```bash
-   sudo apt update && sudo apt install -y wget tor
+   sudo apt update && sudo apt install -y wget
    ```
 2. **Download binaries**
    ```bash
@@ -15,7 +15,9 @@ These instructions explain how to install `monerod` and `monero-wallet-rpc` on U
 3. **Create wallet and start RPC**
    ```bash
    /opt/monero/monero-wallet-cli --generate-new-wallet lottery --password advance
-   /opt/monero/monero-wallet-rpc --wallet-file lottery --rpc-bind-port 18083 --disable-rpc-login --daemon-host localhost
+   /opt/monero/monero-wallet-rpc --wallet-file lottery --rpc-bind-port 18083 \
+     --disable-rpc-login --daemon-address node.moneroworld.com:18089
    ```
+   `monerod` is not started here. The wallet RPC connects to `node.moneroworld.com` so the blockchain is stored remotely.
 4. **Python wrapper example**
    See `wallet_rpc.py` in this folder for Python helper functions.

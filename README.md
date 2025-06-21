@@ -1,7 +1,7 @@
 # Anonymous Weekly Lottery
-This project is designed for small servers (2GB RAM, 25GB disk).
 
-This project provides a simple Monero-based lottery that can run on a small VPS. Users purchase tickets anonymously using Monero and a weekly draw determines the winners.
+This project provides a simple but complete Monero-based lottery designed to run on small VPS machines (2GB RAM, 25GB disk). Users purchase tickets anonymously using Monero and a weekly draw determines the winners.
+
 
 ## Folder Structure
 
@@ -12,9 +12,11 @@ This project provides a simple Monero-based lottery that can run on a small VPS.
 
 ## Setup Guide (Ubuntu)
 
-1. **Install system packages**
+
+1. **Install packages**
    ```bash
-   sudo apt update && sudo apt install -y python3 python3-venv python3-pip tor
+   sudo apt update && sudo apt install -y python3 python3-venv python3-pip tmux
+
    ```
 2. **Clone repository**
    ```bash
@@ -27,28 +29,44 @@ This project provides a simple Monero-based lottery that can run on a small VPS.
    source venv/bin/activate
    pip install flask requests
    ```
-4. **Configure Monero wallet RPC** – see `monero_setup/README.md` to install `monerod` and `monero-wallet-rpc`. Start `monero-wallet-rpc` so the Flask app can talk to it.
-5. **Run the Flask backend**
+
+4. **Edit `config.json`** – set `owner_address` and other values.
+5. **Start wallet RPC** (using a remote node)
    ```bash
+   tmux new -s wallet
+   /opt/monero/monero-wallet-rpc --wallet-file lottery --rpc-bind-port 18083 \
+      --disable-rpc-login --daemon-address node.moneroworld.com:18089
+   # press Ctrl+B then D to detach
+   ```
+6. **Start the Flask app** in another tmux session
+   ```bash
+   tmux new -s flask
+   source venv/bin/activate
    python3 -m backend.app
    ```
-   The site is now available on `http://your-server-ip:5000`.
-6. **Running the draw**
+   The site will be available on `http://your-server-ip:5000`.
+7. **Run the weekly draw**
    ```bash
    python3 -m backend.draw
    ```
-   Add this command to a weekly cron job to automate draws.
+   Schedule this command with `cron` to automate weekly draws.
+
 
 ### Resuming after closing PuTTY
 Use the `screen` or `tmux` command before running the server so that it stays active when you disconnect.
 
-### Onion Service (optional)
-Install Tor and add a hidden service pointing to port 5000. The `torrc` entry looks like:
+### Wallet RPC and Low Disk Usage
+Running a Monero node requires significant disk space. To keep the server under
+25GB you can connect `monero-wallet-rpc` to a **remote node** instead of running
+`monerod` locally:
+
+```bash
+/opt/monero/monero-wallet-rpc --wallet-file lottery --rpc-bind-port 18083 \
+  --disable-rpc-login --daemon-address node.moneroworld.com:18089
 ```
-HiddenServiceDir /var/lib/tor/lottery/
-HiddenServicePort 80 127.0.0.1:5000
-```
-Restart tor and note the generated `.onion` address in `/var/lib/tor/lottery/hostname`.
+Using a remote node avoids storing the blockchain locally. See
+`monero_setup/README.md` for installation details.
+
 
 ## Game Rules
 1. Choose six numbers from 1–49.
