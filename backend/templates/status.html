@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+<head>
+    <title>Ticket Status</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<h1>Ticket Status</h1>
+{% if paid %}
+<p>Your ticket is confirmed for the next draw.</p>
+{% else %}
+<p>Payment not yet detected. Please check again later.</p>
+{% endif %}
+<p><a href="/">Back</a></p>
+</body>
+</html>

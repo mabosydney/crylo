@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+<head>
+    <title>Your Ticket</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<h1>Payment Required</h1>
+<p>Send exactly {{ price }} XMR to the address below. Your ticket ID is {{ ticket_id }}.</p>
+<pre>{{ subaddress }}</pre>
+<p>After payment, <a href="/status/{{ ticket_id }}">check status here</a>.</p>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+<head>
+    <title>Weekly XMR Lottery</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<h1>Weekly XMR Lottery</h1>
+<p>Each ticket costs {{ price }} XMR. Choose 6 numbers between 1 and 49.</p>
+<form action="/buy" method="post">
+    {% for i in range(1,50) %}
+        <label><input type="checkbox" name="numbers" value="{{ i }}"> {{ i }}</label>
+        {% if i % 7 == 0 %}<br>{% endif %}
+    {% endfor %}
+    <button type="submit">Buy Ticket</button>
+</form>
+<p><a href="/results">View Results</a></p>
+</body>
+</html>
