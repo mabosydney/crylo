@@ -1,5 +1,7 @@
 # Anonymous Weekly Lottery
+
 This project provides a simple but complete Monero-based lottery designed to run on small VPS machines (2GB RAM, 25GB disk). Users purchase tickets anonymously using Monero and a weekly draw determines the winners.
+
 
 ## Folder Structure
 
@@ -10,9 +12,11 @@ This project provides a simple but complete Monero-based lottery designed to run
 
 ## Setup Guide (Ubuntu)
 
+
 1. **Install packages**
    ```bash
    sudo apt update && sudo apt install -y python3 python3-venv python3-pip tmux
+
    ```
 2. **Clone repository**
    ```bash
@@ -25,6 +29,7 @@ This project provides a simple but complete Monero-based lottery designed to run
    source venv/bin/activate
    pip install flask requests
    ```
+
 4. **Edit `config.json`** – set `owner_address` and other values.
 5. **Start wallet RPC** (using a remote node)
    ```bash
@@ -46,9 +51,9 @@ This project provides a simple but complete Monero-based lottery designed to run
    ```
    Schedule this command with `cron` to automate weekly draws.
 
+
 ### Resuming after closing PuTTY
 Use the `screen` or `tmux` command before running the server so that it stays active when you disconnect.
-
 
 ### Wallet RPC and Low Disk Usage
 Running a Monero node requires significant disk space. To keep the server under
@@ -61,6 +66,7 @@ Running a Monero node requires significant disk space. To keep the server under
 ```
 Using a remote node avoids storing the blockchain locally. See
 `monero_setup/README.md` for installation details.
+
 
 ## Game Rules
 1. Choose six numbers from 1–49.
