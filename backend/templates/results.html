@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+<head>
+    <title>Latest Results</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<h1>Latest Draw Results</h1>
+{% if result %}
+<p>Week: {{ result[0] }}</p>
+<p>Numbers: {{ result[1] }}</p>
+<p>Winners: {{ result[2] or 'No winners' }}</p>
+<p>Payout: {{ result[3] }} XMR each</p>
+{% else %}
+<p>No draws yet.</p>
+{% endif %}
+<p><a href="/">Back</a></p>
+</body>
+</html>
