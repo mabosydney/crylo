@@ -1,23 +1,22 @@
 # Anonymous Weekly Lottery
 
-This project is a simple Monero lottery that runs on a tiny VPS (2 GB RAM and only 25 GB of disk). Users buy tickets anonymously with Monero and a weekly draw pays out the prize.
+This repository contains a lightweight Monero lottery designed for a small VPS with only 25 GB of storage. Users buy tickets anonymously and a weekly draw selects the winning number.
 
-## Folder Structure
-- `backend/` – Flask app and SQLite database
-- `frontend/` – Static HTML/CSS for the website
-- `monero_setup/` – Helper script for the Monero wallet RPC
-- `config.json` – Settings such as your wallet address and ticket price
+## Folder Overview
+- `backend/` – Flask application and SQLite database
+- `frontend/` – Static website files
+- `monero_setup/` – Helper script for wallet RPC
+- `config.json` – Editable settings (wallet address, draw schedule, etc.)
 
 ## Setup on Ubuntu 22.04
-Follow these steps exactly in a terminal. Each command is shown in full.
+Follow the steps below exactly in a terminal. No coding knowledge is required.
 
-1. **Install system packages**
+1. **Install packages**
    ```bash
    sudo apt update
-   sudo apt install -y python3 python3-venv python3-pip tmux wget
+   sudo apt install -y python3 python3-venv python3-pip tmux wget git
    ```
-
-2. **Download the project**
+2. **Get the code**
    ```bash
    git clone https://github.com/mabosydney/crylo.git
    cd crylo
@@ -29,48 +28,42 @@ Follow these steps exactly in a terminal. Each command is shown in full.
    source venv/bin/activate
    pip install flask requests
    ```
-
-4. **Download the Monero CLI tools**
+4. **Download and extract Monero**
    ```bash
    wget https://downloads.getmonero.org/cli/monero-linux-x64-v0.18.3.1.tar.bz2
    tar -xjf monero-linux-x64-v0.18.3.1.tar.bz2
    sudo mv monero-x86_64-linux-gnu-v0.18.3.1 /opt/monero
    ```
-
-5. **Create a wallet and start wallet RPC**
-   Run these commands inside `tmux` so they keep running when you close PuTTY:
+5. **Create a wallet and start `monero-wallet-rpc`**
+   Run these commands in a tmux session so they keep running after you close PuTTY:
    ```bash
    tmux new -s wallet
    /opt/monero/monero-wallet-cli --generate-new-wallet lottery --password advance
    /opt/monero/monero-wallet-rpc --wallet-file lottery --password advance \
        --rpc-bind-port 18083 --disable-rpc-login \
        --daemon-address node.moneroworld.com:18089
-   # detach with Ctrl+B then D
+   # detach from tmux with Ctrl+B then D
    ```
-   The wallet RPC connects to `node.moneroworld.com` so the blockchain stays remote and disk use stays below 25 GB.
-
+   The wallet RPC talks to the remote node `node.moneroworld.com` so the blockchain stays off your VPS and disk usage remains under 25 GB.
 6. **Edit `config.json`**
-   Set `owner_address` to your main wallet address and adjust any other values you wish.
-
-7. **Start the Flask web app**
-   Use a second tmux session for the web server:
+   Set `owner_address` to your own wallet address and adjust the ticket price or draw time if needed.
+7. **Run the Flask server**
    ```bash
    tmux new -s flask
    source venv/bin/activate
    python3 -m backend.app
    # detach with Ctrl+B then D
    ```
-   Visit `http://<your-server-ip>:5000` in a browser.
-
-8. **Running the weekly draw**
-   To trigger a draw manually:
+   Visit `http://YOUR_SERVER_IP:5000` in your browser to access the site.
+8. **Run the weekly draw**
    ```bash
+   source venv/bin/activate
    python3 -m backend.draw
    ```
-   Add this command to `cron` if you want the draw to run automatically every week.
+   You can automate this with `cron` to run every week.
 
-## After Reboot or Disconnect
-To resume, attach back to your tmux sessions:
+## Reconnecting
+If you disconnect or reboot, reattach the sessions with:
 ```bash
 tmux attach -t wallet
 # or
@@ -78,11 +71,10 @@ tmux attach -t flask
 ```
 
 ## Game Rules
-1. Choose how many tickets you want and the server will create an address for each ticket.
-2. Send **0.1 XMR per ticket** to the provided addresses.
-3. Each ticket receives a random six-digit number.
-4. When the draw runs every week, a winning number is generated.
-5. All tickets matching that number split the pot after a 5% fee is sent to `owner_address`.
+1. Each ticket costs **0.1 XMR** and is assigned a random six‑digit number.
+2. Pay the displayed address for each ticket. Only confirmed payments count.
+3. The prize pool equals all paid tickets before the draw. Winners split the pool after a 5% fee goes to the owner address.
+4. Draws occur on the configured day and time (see `config.json`).
 
 ## License
 MIT

@@ -15,6 +15,10 @@
     <p>Welcome to the anonymous weekly lottery. Each ticket costs {{ price }} XMR.</p>
     <p>Enter how many tickets you want below. You will receive a random six-digit number for each ticket along with a unique payment address.</p>
 </section>
+<section class="draw-info">
+    <p>Current prize pool: {{ '%.4f' % pot_total }} XMR</p>
+    <p>Next draw in {{ countdown }}</p>
+</section>
 <form action="/buy" method="post" class="buy-form">
     <label>Number of tickets: <input type="number" name="quantity" value="1" min="1"></label>
     <button type="submit">Buy Tickets</button>

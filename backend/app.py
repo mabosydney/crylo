@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, abort
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
+import calendar
 from .monero_rpc import MoneroRPC
 from .config import load_config
 from .db import init_db, get_conn
@@ -17,10 +18,42 @@ def generate_ticket_number() -> str:
     """Return a random six-digit ticket number as a string."""
     return f"{int.from_bytes(os.urandom(3), 'big') % 1000000:06d}"
 
+def _next_draw_datetime() -> datetime:
+    """Calculate the datetime of the next scheduled draw in UTC."""
+    now = datetime.utcnow()
+    weekday = list(calendar.day_name).index(config['draw_day'])
+    draw_time = datetime.strptime(config['draw_time'], '%H:%M').time()
+    days_ahead = (weekday - now.weekday()) % 7
+    draw_date = now.date() + timedelta(days=days_ahead)
+    draw_dt = datetime.combine(draw_date, draw_time)
+    if draw_dt <= now:
+        draw_dt += timedelta(days=7)
+    return draw_dt
+
 @app.route('/')
 def index():
-    """Front page with ticket purchase form."""
-    return render_template('index.html', price=config['ticket_price'])
+    """Front page with ticket purchase form and draw info."""
+    conn = get_conn()
+    c = conn.cursor()
+    count = c.execute(
+        'SELECT COUNT(*) FROM tickets WHERE paid=1 AND draw_week IS NULL'
+    ).fetchone()[0]
+    conn.close()
+    pot_total = count * config['ticket_price']
+
+    next_dt = _next_draw_datetime()
+    delta = next_dt - datetime.utcnow()
+    days = delta.days
+    hours, rem = divmod(delta.seconds, 3600)
+    minutes = rem // 60
+    countdown = f"{days}d {hours}h {minutes}m"
+
+    return render_template(
+        'index.html',
+        price=config['ticket_price'],
+        pot_total=pot_total,
+        countdown=countdown,
+    )
 
 @app.route('/buy', methods=['POST'])
 def buy():
