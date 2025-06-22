@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head>
+    <title>Weekly XMR Lottery</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+    <h1>Weekly XMR Lottery</h1>
+    <nav>
+        <a href="/">Home</a> | <a href="/results">Results</a>
+    </nav>
+</header>
+<section class="intro">
+    <p>Welcome to the anonymous weekly lottery. Each ticket costs {{ price }} XMR.</p>
+    <p>Enter how many tickets you want below. You will receive a random six-digit number for each ticket along with a unique payment address.</p>
+</section>
+<form action="/buy" method="post" class="buy-form">
+    <label>Number of tickets: <input type="number" name="quantity" value="1" min="1"></label>
+    <button type="submit">Buy Tickets</button>
+</form>
+<p><a href="/results">View Results</a></p>
+</body>
+</html>

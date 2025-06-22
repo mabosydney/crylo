@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+    <title>Your Ticket</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+    <h1>Weekly XMR Lottery</h1>
+    <nav>
+        <a href="/">Home</a> | <a href="/results">Results</a>
+    </nav>
+</header>
+<h2>Payment Required</h2>
+<p>Send {{ price }} XMR for each ticket to the addresses below.</p>
+<table>
+    <tr><th>Ticket #</th><th>Address</th><th>Status link</th></tr>
+    {% for t in tickets %}
+    <tr>
+        <td>{{ t.number }}</td>
+        <td><pre>{{ t.address }}</pre></td>
+        <td><a href="/status/{{ t.id }}">Check</a></td>
+    </tr>
+    {% endfor %}
+</table>
+<p>Total due: {{ total }} XMR</p>
+</body>
+</html>
