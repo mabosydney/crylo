@@ -1,5 +1,5 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
     background: #f8f9fa;
     max-width: 800px;
     margin: auto;
@@ -12,6 +12,7 @@ header {
     background: linear-gradient(90deg, #343a40, #6c757d);
     color: #fff;
     margin-bottom: 1.5em;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 nav {
     margin-top: 0.5em;
@@ -31,16 +32,29 @@ pre {
 }
 form {
     margin-top: 1em;
+    display: grid;
+    gap: 0.5em;
+}
+input[type="text"], input[type="number"] {
+    padding: 0.5em;
+    width: 100%;
+    box-sizing: border-box;
 }
 button {
     padding: 0.5em 1em;
     cursor: pointer;
+    background: #343a40;
+    border: none;
+    color: #fff;
+    border-radius: 3px;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1em;
+    border-radius: 4px;
+    overflow: hidden;
 }
 th, td {
     border: 1px solid #ccc;

@@ -11,8 +11,7 @@ def init_db():
         '''CREATE TABLE IF NOT EXISTS tickets (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             ticket_number TEXT NOT NULL,
-            subaddress_index INTEGER,
-            subaddress TEXT NOT NULL,
+            user_address TEXT NOT NULL,
             paid INTEGER DEFAULT 0,
             draw_week INTEGER
         )'''

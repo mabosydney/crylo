@@ -18,6 +18,24 @@ def generate_ticket_number() -> str:
     """Return a random six-digit ticket number as a string."""
     return f"{int.from_bytes(os.urandom(3), 'big') % 1000000:06d}"
 
+def sync_payments() -> None:
+    """Mark unpaid tickets as paid based on total confirmed balance."""
+    transfers = monero.get_transfers(**{"in": True})
+    total_received = 0.0
+    if 'in' in transfers:
+        total_received = sum(t['amount'] for t in transfers['in']) / 1e12
+    conn = get_conn()
+    c = conn.cursor()
+    paid_count = c.execute('SELECT COUNT(*) FROM tickets WHERE paid=1').fetchone()[0]
+    should_be_paid = int(total_received / config['ticket_price'])
+    diff = should_be_paid - paid_count
+    if diff > 0:
+        ids = c.execute('SELECT id FROM tickets WHERE paid=0 ORDER BY id LIMIT ?', (diff,)).fetchall()
+        for row in ids:
+            c.execute('UPDATE tickets SET paid=1 WHERE id=?', (row[0],))
+    conn.commit()
+    conn.close()
+
 def _next_draw_datetime() -> datetime:
     """Calculate the datetime of the next scheduled draw in UTC."""
     now = datetime.utcnow()
@@ -33,6 +51,7 @@ def _next_draw_datetime() -> datetime:
 @app.route('/')
 def index():
     """Front page with ticket purchase form and draw info."""
+    sync_payments()
     conn = get_conn()
     c = conn.cursor()
     count = c.execute(
@@ -57,60 +76,44 @@ def index():
 
 @app.route('/buy', methods=['POST'])
 def buy():
-    """Create ticket(s) and show subaddresses for payment."""
+    """Create ticket(s) and show payment instructions."""
     try:
         qty = int(request.form.get('quantity', '1'))
     except ValueError:
         abort(400, 'Invalid quantity')
     if qty <= 0:
         abort(400, 'Quantity must be positive')
-
+    addr = request.form.get('address', '').strip()
+    if not addr:
+        abort(400, 'Wallet address required')
     tickets = []
     conn = get_conn()
     c = conn.cursor()
     for _ in range(qty):
-        addr_res = monero.create_subaddress()
-        subaddress = addr_res['address']
-        sub_index = addr_res['address_index']
         number = generate_ticket_number()
         c.execute(
-            'INSERT INTO tickets (ticket_number, subaddress_index, subaddress) VALUES (?,?,?)',
-            (number, sub_index, subaddress),
+            'INSERT INTO tickets (ticket_number, user_address) VALUES (?,?)',
+            (number, addr),
         )
         ticket_id = c.lastrowid
-        tickets.append({'id': ticket_id, 'number': number, 'address': subaddress})
+        tickets.append({'id': ticket_id, 'number': number})
     conn.commit()
     conn.close()
 
     total = qty * config['ticket_price']
-    return render_template('ticket.html', tickets=tickets, price=config['ticket_price'], total=total)
-
+    return render_template('ticket.html', tickets=tickets, price=config['ticket_price'], total=total, owner_address=config['owner_address'])
+  
 @app.route('/status/<int:ticket_id>')
 def status(ticket_id):
     """Check whether payment for a ticket has been received."""
+    sync_payments()
     conn = get_conn()
     c = conn.cursor()
-    row = c.execute('SELECT paid, subaddress_index FROM tickets WHERE id=?', (ticket_id,)).fetchone()
+    row = c.execute('SELECT paid FROM tickets WHERE id=?', (ticket_id,)).fetchone()
     conn.close()
     if not row:
         abort(404)
-    paid, sub_index = row
-    if not paid:
-        transfers = monero.get_transfers(**{
-            'in': True,
-            'account_index': 0,
-            'subaddr_indices': [sub_index]
-        })
-        paid = False
-        if 'in' in transfers:
-            amount = sum(t['amount'] for t in transfers['in']) / 1e12
-            if amount >= config['ticket_price']:
-                conn = get_conn()
-                c = conn.cursor()
-                c.execute('UPDATE tickets SET paid=1 WHERE id=?', (ticket_id,))
-                conn.commit()
-                conn.close()
-                paid = True
+    paid = bool(row[0])
     return render_template('status.html', paid=paid)
 
 # Placeholder results
@@ -131,8 +134,9 @@ def draw():
     winning = generate_ticket_number()
     conn = get_conn()
     c = conn.cursor()
+    sync_payments()
     week = int(datetime.utcnow().strftime('%Y%W'))
-    entries = c.execute('SELECT id, ticket_number, subaddress FROM tickets WHERE paid=1 AND draw_week IS NULL').fetchall()
+    entries = c.execute('SELECT id, ticket_number, user_address FROM tickets WHERE paid=1 AND draw_week IS NULL').fetchall()
     winners = []
     for eid, num, addr in entries:
         if num == winning:
@@ -145,7 +149,7 @@ def draw():
         payout = (total_pool - fee_amt) / len(winners)
         if fee_amt > 0:
             monero.transfer([{"address": config['owner_address'], "amount": int(fee_amt*1e12)}])
-        for eid, addr in winners:
+        for _, addr in winners:
             monero.transfer([{"address": addr, "amount": int(payout*1e12)}])
     c.execute(
         'INSERT OR REPLACE INTO results (week, winning_number, winners, payout) VALUES (?,?,?,?)',

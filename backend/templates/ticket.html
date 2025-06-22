@@ -12,13 +12,13 @@
     </nav>
 </header>
 <h2>Payment Required</h2>
-<p>Send {{ price }} XMR for each ticket to the addresses below.</p>
+<p>Send {{ price }} XMR for each ticket to the address below.</p>
+<pre>{{ owner_address }}</pre>
 <table>
-    <tr><th>Ticket #</th><th>Address</th><th>Status link</th></tr>
+    <tr><th>Ticket #</th><th>Status link</th></tr>
     {% for t in tickets %}
     <tr>
         <td>{{ t.number }}</td>
-        <td><pre>{{ t.address }}</pre></td>
         <td><a href="/status/{{ t.id }}">Check</a></td>
     </tr>
     {% endfor %}

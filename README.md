@@ -21,7 +21,6 @@ Follow the steps below exactly in a terminal. No coding knowledge is required.
    git clone https://github.com/mabosydney/crylo.git
    cd crylo
    ```
-
 3. **Create the Python environment**
    ```bash
    python3 -m venv venv
@@ -54,7 +53,8 @@ Follow the steps below exactly in a terminal. No coding knowledge is required.
    python3 -m backend.app
    # detach with Ctrl+B then D
    ```
-   Visit `http://YOUR_SERVER_IP:5000` in your browser to access the site.
+   Visit `http://YOUR_SERVER_IP:5000` in your browser to access the site. When buying tickets, provide your own wallet address so winnings can be sent to you.
+
 8. **Run the weekly draw**
    ```bash
    source venv/bin/activate
@@ -72,7 +72,7 @@ tmux attach -t flask
 
 ## Game Rules
 1. Each ticket costs **0.1 XMR** and is assigned a random six‑digit number.
-2. Pay the displayed address for each ticket. Only confirmed payments count.
+2. Pay the same address shown after purchase for each ticket. Only confirmed payments count.
 3. The prize pool equals all paid tickets before the draw. Winners split the pool after a 5% fee goes to the owner address.
 4. Draws occur on the configured day and time (see `config.json`).
 
