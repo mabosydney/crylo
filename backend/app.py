@@ -19,7 +19,6 @@ def generate_ticket_number() -> str:
     """Return a random six-digit ticket number as a string."""
     return f"{int.from_bytes(os.urandom(3), 'big') % 1000000:06d}"
 
-
 ADDRESS_RE = re.compile(r"^[48][0-9AB][1-9A-HJ-NP-Za-km-z]{93,105}$")
 
 
@@ -44,7 +43,6 @@ def sync_payments() -> None:
             c.execute('UPDATE tickets SET paid=1 WHERE id=?', (row[0],))
     conn.commit()
     conn.close()
-
 
 def _next_draw_datetime() -> datetime:
     """Calculate the datetime of the next scheduled draw in UTC."""
@@ -98,7 +96,6 @@ def buy():
         abort(400, 'Wallet address required')
     if not validate_address(addr):
         abort(400, 'Invalid wallet address')
-
     tickets = []
     conn = get_conn()
     c = conn.cursor()
