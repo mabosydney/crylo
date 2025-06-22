@@ -18,14 +18,12 @@ Follow these steps exactly in a terminal. Each command is shown in full.
    ```
 
 2. **Download the project**
-
    ```bash
    git clone https://github.com/mabosydney/crylo.git
    cd crylo
    ```
 
 3. **Create the Python environment**
-
    ```bash
    python3 -m venv venv
    source venv/bin/activate
@@ -85,7 +83,6 @@ tmux attach -t flask
 3. Each ticket receives a random six-digit number.
 4. When the draw runs every week, a winning number is generated.
 5. All tickets matching that number split the pot after a 5% fee is sent to `owner_address`.
-
 
 ## License
 MIT

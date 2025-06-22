@@ -24,7 +24,7 @@ def init_db():
             winners TEXT,
             payout REAL
         )'''
-    
+    )
     conn.commit()
     conn.close()
 
