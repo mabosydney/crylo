@@ -54,6 +54,7 @@ Follow the steps below exactly in a terminal. No coding knowledge is required.
    # detach with Ctrl+B then D
    ```
    Visit `http://YOUR_SERVER_IP:5000` in your browser to access the site. When buying tickets, provide your own wallet address so winnings can be sent to you.
+
 8. **Run the weekly draw**
    ```bash
    source venv/bin/activate

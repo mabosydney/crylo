@@ -18,7 +18,6 @@ def generate_ticket_number() -> str:
     """Return a random six-digit ticket number as a string."""
     return f"{int.from_bytes(os.urandom(3), 'big') % 1000000:06d}"
 
-
 def sync_payments() -> None:
     """Mark unpaid tickets as paid based on total confirmed balance."""
     transfers = monero.get_transfers(**{"in": True})
@@ -36,7 +35,6 @@ def sync_payments() -> None:
             c.execute('UPDATE tickets SET paid=1 WHERE id=?', (row[0],))
     conn.commit()
     conn.close()
-
 
 def _next_draw_datetime() -> datetime:
     """Calculate the datetime of the next scheduled draw in UTC."""
@@ -88,7 +86,6 @@ def buy():
     addr = request.form.get('address', '').strip()
     if not addr:
         abort(400, 'Wallet address required')
-
     tickets = []
     conn = get_conn()
     c = conn.cursor()
@@ -105,7 +102,7 @@ def buy():
 
     total = qty * config['ticket_price']
     return render_template('ticket.html', tickets=tickets, price=config['ticket_price'], total=total, owner_address=config['owner_address'])
-
+  
 @app.route('/status/<int:ticket_id>')
 def status(ticket_id):
     """Check whether payment for a ticket has been received."""
