@@ -12,8 +12,17 @@
     </nav>
 </header>
 <h2>Payment Required</h2>
-<p>Send exactly {{ price }} XMR to the address below. Your ticket ID is {{ ticket_id }}.</p>
-<pre>{{ subaddress }}</pre>
-<p>After payment, <a href="/status/{{ ticket_id }}">check status here</a>.</p>
+<p>Send {{ price }} XMR for each ticket to the addresses below.</p>
+<table>
+    <tr><th>Ticket #</th><th>Address</th><th>Status link</th></tr>
+    {% for t in tickets %}
+    <tr>
+        <td>{{ t.number }}</td>
+        <td><pre>{{ t.address }}</pre></td>
+        <td><a href="/status/{{ t.id }}">Check</a></td>
+    </tr>
+    {% endfor %}
+</table>
+<p>Total due: {{ total }} XMR</p>
 </body>
 </html>

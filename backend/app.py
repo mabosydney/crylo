@@ -1,8 +1,6 @@
-from flask import Flask, request, redirect, url_for, render_template, abort
+from flask import Flask, request, render_template, abort
 import os
-import sqlite3
 from datetime import datetime
-from pathlib import Path
 from .monero_rpc import MoneroRPC
 from .config import load_config
 from .db import init_db, get_conn
@@ -15,9 +13,9 @@ monero = MoneroRPC(RPC_URL)
 
 init_db()
 
-def generate_numbers():
-    """Return six random numbers between 1 and 49."""
-    return [int.from_bytes(os.urandom(2), 'big') % 49 + 1 for _ in range(6)]
+def generate_ticket_number() -> str:
+    """Return a random six-digit ticket number as a string."""
+    return f"{int.from_bytes(os.urandom(3), 'big') % 1000000:06d}"
 
 @app.route('/')
 def index():
@@ -26,22 +24,33 @@ def index():
 
 @app.route('/buy', methods=['POST'])
 def buy():
-    """Create a new ticket and display the subaddress for payment."""
-    numbers = request.form.getlist('numbers')
-    if len(numbers) != 6:
-        abort(400, 'Choose exactly 6 numbers')
-    nums = ','.join(sorted(numbers))
-    addr_res = monero.create_subaddress()
-    subaddress = addr_res['address']
-    sub_index = addr_res['address_index']
+    """Create ticket(s) and show subaddresses for payment."""
+    try:
+        qty = int(request.form.get('quantity', '1'))
+    except ValueError:
+        abort(400, 'Invalid quantity')
+    if qty <= 0:
+        abort(400, 'Quantity must be positive')
+
+    tickets = []
     conn = get_conn()
     c = conn.cursor()
-    c.execute('INSERT INTO tickets (numbers, subaddress_index, subaddress) VALUES (?, ?, ?)',
-              (nums, sub_index, subaddress))
-    ticket_id = c.lastrowid
+    for _ in range(qty):
+        addr_res = monero.create_subaddress()
+        subaddress = addr_res['address']
+        sub_index = addr_res['address_index']
+        number = generate_ticket_number()
+        c.execute(
+            'INSERT INTO tickets (ticket_number, subaddress_index, subaddress) VALUES (?,?,?)',
+            (number, sub_index, subaddress),
+        )
+        ticket_id = c.lastrowid
+        tickets.append({'id': ticket_id, 'number': number, 'address': subaddress})
     conn.commit()
     conn.close()
-    return render_template('ticket.html', subaddress=subaddress, ticket_id=ticket_id, price=config['ticket_price'])
+
+    total = qty * config['ticket_price']
+    return render_template('ticket.html', tickets=tickets, price=config['ticket_price'], total=total)
 
 @app.route('/status/<int:ticket_id>')
 def status(ticket_id):
@@ -77,7 +86,7 @@ def results():
     """Show the latest draw results."""
     conn = get_conn()
     c = conn.cursor()
-    row = c.execute('SELECT week, numbers, winners, payout FROM results ORDER BY week DESC LIMIT 1').fetchone()
+    row = c.execute('SELECT week, winning_number, winners, payout FROM results ORDER BY week DESC LIMIT 1').fetchone()
     conn.close()
     return render_template('results.html', result=row)
 
@@ -86,15 +95,14 @@ def draw():
     """Perform the weekly draw and send payouts."""
     if request.form.get('password') != config['admin_password']:
         abort(403)
-    numbers = generate_numbers()
+    winning = generate_ticket_number()
     conn = get_conn()
     c = conn.cursor()
     week = int(datetime.utcnow().strftime('%Y%W'))
-    entries = c.execute('SELECT id, numbers, subaddress FROM tickets WHERE paid=1 AND draw_week IS NULL').fetchall()
+    entries = c.execute('SELECT id, ticket_number, subaddress FROM tickets WHERE paid=1 AND draw_week IS NULL').fetchall()
     winners = []
-    for eid, nums, addr in entries:
-        nums_set = set(map(int, nums.split(',')))
-        if nums_set == set(numbers):
+    for eid, num, addr in entries:
+        if num == winning:
             winners.append((eid, addr))
         c.execute('UPDATE tickets SET draw_week=? WHERE id=?', (week, eid))
     payout = 0
@@ -106,7 +114,10 @@ def draw():
             monero.transfer([{"address": config['owner_address'], "amount": int(fee_amt*1e12)}])
         for eid, addr in winners:
             monero.transfer([{"address": addr, "amount": int(payout*1e12)}])
-    c.execute('INSERT OR REPLACE INTO results (week, numbers, winners, payout) VALUES (?,?,?,?)', (week, ','.join(map(str,numbers)), ','.join(a for _,a in winners), payout))
+    c.execute(
+        'INSERT OR REPLACE INTO results (week, winning_number, winners, payout) VALUES (?,?,?,?)',
+        (week, winning, ','.join(a for _, a in winners), payout),
+    )
     conn.commit()
     conn.close()
     return 'Draw complete'

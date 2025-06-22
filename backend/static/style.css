@@ -1,21 +1,28 @@
 body {
     font-family: Arial, sans-serif;
     background: #f8f9fa;
-    max-width: 700px;
+    max-width: 800px;
     margin: auto;
     padding: 2em;
 }
-header,
-nav,
-footer {
+
+header {
     text-align: center;
-    margin-bottom: 1em;
+    padding: 1em 0;
+    background: linear-gradient(90deg, #343a40, #6c757d);
+    color: #fff;
+    margin-bottom: 1.5em;
+}
+nav {
+    margin-top: 0.5em;
 }
 nav a {
     margin: 0 10px;
+    color: #fff;
+    text-decoration: none;
 }
 h1 {
-    text-align: center;
+    margin: 0;
 }
 pre {
     background: #e9ecef;
@@ -27,10 +34,7 @@ form {
 }
 button {
     padding: 0.5em 1em;
-}
-.numbers label {
-    display: inline-block;
-    width: 40px;
+    cursor: pointer;
 }
 table {
     width: 100%;
@@ -41,4 +45,8 @@ th, td {
     border: 1px solid #ccc;
     padding: 0.5em;
     text-align: left;
+}
+
+tr:nth-child(even) {
+    background: #f1f1f1;
 }

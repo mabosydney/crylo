@@ -11,13 +11,13 @@
         <a href="/">Home</a> | <a href="/results">Results</a>
     </nav>
 </header>
-<p>Each ticket costs {{ price }} XMR. Choose 6 numbers between 1 and 49.</p>
-<form action="/buy" method="post">
-    {% for i in range(1,50) %}
-        <label><input type="checkbox" name="numbers" value="{{ i }}"> {{ i }}</label>
-        {% if i % 7 == 0 %}<br>{% endif %}
-    {% endfor %}
-    <button type="submit">Buy Ticket</button>
+<section class="intro">
+    <p>Welcome to the anonymous weekly lottery. Each ticket costs {{ price }} XMR.</p>
+    <p>Enter how many tickets you want below. You will receive a random six-digit number for each ticket along with a unique payment address.</p>
+</section>
+<form action="/buy" method="post" class="buy-form">
+    <label>Number of tickets: <input type="number" name="quantity" value="1" min="1"></label>
+    <button type="submit">Buy Tickets</button>
 </form>
 <p><a href="/results">View Results</a></p>
 </body>
