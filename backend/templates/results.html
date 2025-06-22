@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+    <title>Latest Results</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+    <h1>Weekly XMR Lottery</h1>
+    <nav>
+        <a href="/">Home</a> | <a href="/results">Results</a>
+    </nav>
+</header>
+<h2>Latest Draw Results</h2>
+{% if result %}
+<table>
+    <tr><th>Week</th><td>{{ result[0] }}</td></tr>
+    <tr><th>Winning Number</th><td>{{ result[1] }}</td></tr>
+    <tr><th>Winners</th><td>{{ result[2] or 'No winners' }}</td></tr>
+    <tr><th>Payout</th><td>{{ result[3] }} XMR each</td></tr>
+</table>
+{% else %}
+<p>No draws yet.</p>
+{% endif %}
+<p><a href="/">Back</a></p>
+</body>
+</html>

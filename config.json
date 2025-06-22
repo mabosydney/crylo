@@ -1,0 +1,10 @@
+{
+  "owner_address": "481DSbrD8E4QQcLfTZE8GJZ5zoCw1EkZcgdTjgVgnXno9DG4wb99QNdCuHLCZmZ8DkB59d8EQeVy57wAVqiFAhc18GrTAsy",
+  "ticket_price": 0.1,
+  "draw_day": "Sunday",
+  "draw_time": "00:00",
+  "fee_percent": 5,
+  "admin_password": "advance",
+  "port": 5000,
+  "wallet_rpc_url": "http://localhost:18083/json_rpc"
+}
