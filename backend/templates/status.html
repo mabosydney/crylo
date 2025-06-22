@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head>
+    <title>Ticket Status</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+    <h1>Weekly XMR Lottery</h1>
+    <nav>
+        <a href="/">Home</a> | <a href="/results">Results</a>
+    </nav>
+</header>
+<h2>Ticket Status</h2>
+{% if paid %}
+<p>Your ticket is confirmed for the next draw.</p>
+{% else %}
+<p>Payment not yet detected. Please check again later.</p>
+{% endif %}
+<p><a href="/">Back</a></p>
+</body>
+</html>
