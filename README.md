@@ -40,12 +40,15 @@ Follow the steps below exactly in a terminal. No coding knowledge is required.
    /opt/monero/monero-wallet-cli --generate-new-wallet lottery --password advance
    /opt/monero/monero-wallet-rpc --wallet-file lottery --password advance \
        --rpc-bind-port 18083 --disable-rpc-login \
-       --daemon-address node.moneroworld.com:18089
+       --daemon-address 88.3.210.198:18081
    # detach from tmux with Ctrl+B then D
    ```
-   The wallet RPC talks to the remote node `node.moneroworld.com` so the blockchain stays off your VPS and disk usage remains under 25 GB.
+   The wallet RPC uses the remote node `88.3.210.198:18081` so the blockchain
+   stays off your VPS and disk usage remains under 25 GB.
 6. **Edit `config.json`**
-   Set `owner_address` to your own wallet address and adjust the ticket price or draw time if needed.
+   Set `owner_address` to your wallet address and adjust the ticket price or draw
+   time if needed.  If you start `monero-wallet-rpc` on a different port,
+   update `wallet_rpc_url` as well.
 7. **Run the Flask server**
    ```bash
    tmux new -s flask
