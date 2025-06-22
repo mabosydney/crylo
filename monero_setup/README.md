@@ -15,8 +15,14 @@ These instructions explain how to install `monero-wallet-rpc` on Ubuntu and conn
 3. **Create wallet and start RPC**
    ```bash
    /opt/monero/monero-wallet-cli --generate-new-wallet lottery --password advance
-   /opt/monero/monero-wallet-rpc --wallet-file lottery --rpc-bind-port 18083 \     --disable-rpc-login --daemon-address 88.3.210.198:18081
+   /opt/monero/monero-wallet-rpc --wallet-file lottery --password advance \
+     --rpc-bind-port 18083 --disable-rpc-login --trusted-daemon \
+     --daemon-address 88.3.210.198:18081
    ```
+   Verify it responds:
+   ```bash
+   curl -d '{"jsonrpc":"2.0","id":0,"method":"get_balance"}' \
+        http://localhost:18083/json_rpc
    `monerod` is not started here. The wallet RPC connects to the remote node
    `88.3.210.198:18081` so the blockchain is stored remotely and disk usage
    stays under 25 GB.

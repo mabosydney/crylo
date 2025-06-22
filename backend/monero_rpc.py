@@ -18,8 +18,11 @@ class MoneroRPC:
             "method": method,
             "params": params,
         }
-        response = requests.post(self.url, json=payload, auth=self.auth)
-        response.raise_for_status()
+        try:
+            response = requests.post(self.url, json=payload, auth=self.auth, timeout=10)
+            response.raise_for_status()
+        except requests.RequestException as e:
+            raise ConnectionError(f"Wallet RPC unreachable at {self.url}: {e}")
         res = response.json()
         if 'error' in res:
             raise RuntimeError(res['error'])
