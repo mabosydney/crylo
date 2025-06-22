@@ -1,0 +1,60 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f8f9fa;
+    max-width: 800px;
+    margin: auto;
+    padding: 2em;
+}
+
+header {
+    text-align: center;
+    padding: 1em 0;
+    background: linear-gradient(90deg, #343a40, #6c757d);
+    color: #fff;
+    margin-bottom: 1.5em;
+}
+nav {
+    margin-top: 0.5em;
+}
+nav a {
+    margin: 0 10px;
+    color: #fff;
+    text-decoration: none;
+}
+h1 {
+    margin: 0;
+}
+pre {
+    background: #e9ecef;
+    padding: 1em;
+    word-break: break-all;
+}
+form {
+    margin-top: 1em;
+}
+button {
+    padding: 0.5em 1em;
+    cursor: pointer;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1em;
+}
+th, td {
+    border: 1px solid #ccc;
+    padding: 0.5em;
+    text-align: left;
+}
+
+tr:nth-child(even) {
+    background: #f1f1f1;
+}
+
+.draw-info {
+    background: #e9ecef;
+    padding: 1em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
