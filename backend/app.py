@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, abort
 import os
 from datetime import datetime, timedelta
 import calendar
+import re
 from .monero_rpc import MoneroRPC
 from .config import load_config
 from .db import init_db, get_conn
@@ -17,6 +18,13 @@ init_db()
 def generate_ticket_number() -> str:
     """Return a random six-digit ticket number as a string."""
     return f"{int.from_bytes(os.urandom(3), 'big') % 1000000:06d}"
+
+ADDRESS_RE = re.compile(r"^[48][0-9AB][1-9A-HJ-NP-Za-km-z]{93,105}$")
+
+
+def validate_address(addr: str) -> bool:
+    """Return True if ``addr`` looks like a valid Monero address."""
+    return bool(ADDRESS_RE.fullmatch(addr))
 
 def sync_payments() -> None:
     """Mark unpaid tickets as paid based on total confirmed balance."""
@@ -86,6 +94,8 @@ def buy():
     addr = request.form.get('address', '').strip()
     if not addr:
         abort(400, 'Wallet address required')
+    if not validate_address(addr):
+        abort(400, 'Invalid wallet address')
     tickets = []
     conn = get_conn()
     c = conn.cursor()
@@ -102,7 +112,7 @@ def buy():
 
     total = qty * config['ticket_price']
     return render_template('ticket.html', tickets=tickets, price=config['ticket_price'], total=total, owner_address=config['owner_address'])
-  
+
 @app.route('/status/<int:ticket_id>')
 def status(ticket_id):
     """Check whether payment for a ticket has been received."""

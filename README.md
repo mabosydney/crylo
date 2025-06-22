@@ -53,8 +53,9 @@ Follow the steps below exactly in a terminal. No coding knowledge is required.
    python3 -m backend.app
    # detach with Ctrl+B then D
    ```
-   Visit `http://YOUR_SERVER_IP:5000` in your browser to access the site. When buying tickets, provide your own wallet address so winnings can be sent to you.
-
+   Visit `http://YOUR_SERVER_IP:5000` in your browser to access the site.
+   When buying tickets, enter a valid Monero address (95 or 106 characters) so winnings can be sent to you.
+   
 8. **Run the weekly draw**
    ```bash
    source venv/bin/activate
