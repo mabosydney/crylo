@@ -21,6 +21,7 @@ Follow the steps below exactly in a terminal. No coding knowledge is required.
    git clone https://github.com/mabosydney/crylo.git
    cd crylo
    ```
+
 3. **Create the Python environment**
    ```bash
    python3 -m venv venv

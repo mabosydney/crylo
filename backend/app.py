@@ -18,7 +18,6 @@ def generate_ticket_number() -> str:
     """Return a random six-digit ticket number as a string."""
     return f"{int.from_bytes(os.urandom(3), 'big') % 1000000:06d}"
 
-
 def _next_draw_datetime() -> datetime:
     """Calculate the datetime of the next scheduled draw in UTC."""
     now = datetime.utcnow()
