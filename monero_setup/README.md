@@ -22,7 +22,7 @@ These instructions explain how to install `monero-wallet-rpc` on Ubuntu and conn
    Verify it responds:
    ```bash
    curl -d '{"jsonrpc":"2.0","id":0,"method":"get_balance"}' \
-        http://localhost:18083/json_rpc
+        http://localhost:18083/json_rpcn
    ```
    `monerod` is not started here. The wallet RPC connects to the remote node
    `88.3.210.198:18081` so the blockchain is stored remotely and disk usage
