@@ -12,7 +12,6 @@ app = Flask(__name__)
 
 # connect to monero-wallet-rpc using the URL from config
 RPC_URL = config.get('wallet_rpc_url', 'http://localhost:18083/json_rpc')
-
 monero = MoneroRPC(RPC_URL)
 
 init_db()

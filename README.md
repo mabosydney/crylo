@@ -39,12 +39,17 @@ Follow the steps below exactly in a terminal. No coding knowledge is required.
    tmux new -s wallet
    /opt/monero/monero-wallet-cli --generate-new-wallet lottery --password advance
    /opt/monero/monero-wallet-rpc --wallet-file lottery --password advance \
-       --rpc-bind-port 18083 --disable-rpc-login \
+       --rpc-bind-port 18083 --disable-rpc-login --trusted-daemon \
        --daemon-address 88.3.210.198:18081
    # detach from tmux with Ctrl+B then D
    ```
    The wallet RPC uses the remote node `88.3.210.198:18081` so the blockchain
    stays off your VPS and disk usage remains under 25 GB.
+   After starting, verify it responds by running:
+   ```bash
+   curl -d '{"jsonrpc":"2.0","id":0,"method":"get_balance"}' \
+        http://localhost:18083/json_rpc
+   ```
 6. **Edit `config.json`**
    Set `owner_address` to your wallet address and adjust the ticket price or draw
    time if needed.  If you start `monero-wallet-rpc` on a different port,
